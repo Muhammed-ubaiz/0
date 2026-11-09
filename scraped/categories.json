@@ -1,0 +1,98 @@
+[
+  {
+    "id": "aluminium-products",
+    "name": "Aluminium Containers",
+    "handle": "aluminium-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/61S0xvePy6L._AC_SX569__with_bgc.png?format=webp&v=1772018707",
+    "description": "High-grade aluminium containers, foil rolls, oval platters, and rectangular pots with lids.",
+    "products_count": 41
+  },
+  {
+    "id": "black-base-containers",
+    "name": "Black Base Containers",
+    "handle": "black-base-containers",
+    "image": "https://idealpackstore.com/cdn/shop/files/p6.png?format=webp&v=1785321233",
+    "description": "Microwave-safe heavy duty black base food containers, bowls, and sushi trays.",
+    "products_count": 23
+  },
+  {
+    "id": "cleaning-tools",
+    "name": "Cleaning Tools",
+    "handle": "cleaning-tools",
+    "image": "https://idealpackstore.com/cdn/shop/files/61Ii95rFbBL._AC_SX466__870x870_0403d26a-5d79-4227-8a5e-a30003b84bb7.jpg?format=webp&v=1772459595",
+    "description": "Professional cleaning accessories, microfiber towels, dusters, and supplies.",
+    "products_count": 32
+  },
+  {
+    "id": "clear-containers",
+    "name": "Clear Containers",
+    "handle": "clear-containers",
+    "image": "https://idealpackstore.com/cdn/shop/files/61oX-dJR8UL._AC_SX466__with_bgc.png?format=webp&v=1772277616",
+    "description": "Transparent food containers, airtight glass jars, dessert cups, and storage containers.",
+    "products_count": 31
+  },
+  {
+    "id": "eco-friendly-products",
+    "name": "Eco-Friendly Products",
+    "handle": "eco-friendly-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/r1.png?format=webp&v=1785396169",
+    "description": "Biodegradable, compostable paper, bagasse tableware, bamboo cutlery, and green packaging.",
+    "products_count": 38
+  },
+  {
+    "id": "foam-products",
+    "name": "Foam Products",
+    "handle": "foam-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/51KG6k2wQLL._AC_SY450__with_bgc.png?format=webp&v=1772261621",
+    "description": "Insulated foam cups, plates, and takeout packaging for hot and cold foods.",
+    "products_count": 8
+  },
+  {
+    "id": "ideal-care-products",
+    "name": "Ideal Care Products",
+    "handle": "ideal-care-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/31iHHOaXjWL._AC_SY450__with_bgc.png?format=webp&v=1772460597",
+    "description": "Hygiene and safety goods including powder-free nitrile gloves and protective wear.",
+    "products_count": 16
+  },
+  {
+    "id": "kraft-products",
+    "name": "Kraft Products",
+    "handle": "kraft-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/p99_a8d6da7b-d0b3-46fd-bec1-ea8e595a594d.png?format=webp&v=1785323506",
+    "description": "Kraft ripple cups, salad bowls, burger boxes, sandwich wedges, and takeout boxes.",
+    "products_count": 21
+  },
+  {
+    "id": "paper-products",
+    "name": "Paper Products",
+    "handle": "paper-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/71m-jTz3LmL._AC_SX569__with_bgc.png?format=webp&v=1772265170",
+    "description": "Paper cups, plates, napkins, baking paper, and catering paper goods.",
+    "products_count": 19
+  },
+  {
+    "id": "plastic-products",
+    "name": "Plastic Products",
+    "handle": "plastic-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/v1_74cd0daf-69af-4be5-996c-fffcca500ecd.png?format=webp&v=1785393223",
+    "description": "Plastic cups, sauce dispensers, storage bottles, dining cutlery, and portion pots.",
+    "products_count": 131
+  },
+  {
+    "id": "plastic-roll-bags",
+    "name": "Plastic Roll & Bags",
+    "handle": "plastic-roll-bags",
+    "image": "https://idealpackstore.com/cdn/shop/files/ac1.png?format=webp&v=1785397379",
+    "description": "Food cling wrap rolls, heavy-duty garbage bags, vacuum bags, and shopping bags.",
+    "products_count": 13
+  },
+  {
+    "id": "tissue-products",
+    "name": "Tissue Products",
+    "handle": "tissue-products",
+    "image": "https://idealpackstore.com/cdn/shop/files/71Zy1v1WRL._AC_SX679__with_bgc.png?format=webp&v=1771671988",
+    "description": "Maxi rolls, premium facial tissues, napkins, and commercial paper rolls.",
+    "products_count": 4
+  }
+]

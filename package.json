@@ -1,0 +1,14 @@
+{
+  "name": "idealpackstore",
+  "version": "1.0.0",
+  "description": "Ideal Pack Store Clone with Firebase Backend and Full Data",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend start",
+    "build": "npm --prefix frontend run build",
+    "seed": "npm --prefix backend run seed",
+    "deploy:hosting": "npm run build && firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore:rules",
+    "deploy:all": "npm run build && firebase deploy"
+  }
+}
