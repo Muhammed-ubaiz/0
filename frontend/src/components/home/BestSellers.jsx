@@ -12,7 +12,7 @@ export default function BestSellers() {
   const arrow = 'grid size-11 place-items-center rounded-md border border-navy/20 bg-white text-navy transition-colors hover:bg-navy hover:text-white';
 
   return (
-    <section className="bg-mist py-16 lg:py-24">
+    <section className="border-t border-navy/10 bg-white py-16 lg:py-24">
       <div className="shell">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>

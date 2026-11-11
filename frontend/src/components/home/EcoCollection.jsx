@@ -10,7 +10,7 @@ const items = inCategory('eco-friendly-products').slice(0, 4);
 
 export default function EcoCollection() {
   return (
-    <section className="bg-mist py-16 lg:py-24">
+    <section className="border-t border-navy/10 bg-white py-16 lg:py-24">
       <div className="shell grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <Reveal className="order-2 grid grid-cols-2 gap-3 sm:gap-5 lg:order-1">
           {items.map((product) => (

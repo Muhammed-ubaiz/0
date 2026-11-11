@@ -20,10 +20,10 @@ export function Breadcrumbs({ items, light = false }) {
   );
 }
 
-export default function PageIntro({ title, intro, crumbs, children }) {
+export default function PageIntro({ title, intro, crumbs, wide = false, children }) {
   return (
-    <div className="border-b border-navy/10 bg-mist">
-      <div className="shell py-8 lg:py-10">
+    <div className="border-b border-navy/10 bg-white">
+      <div className={`${wide ? 'shell-wide' : 'shell'} py-8 lg:py-10`}>
         <Breadcrumbs items={[{ label: 'Home', to: '/' }, ...crumbs]} />
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">

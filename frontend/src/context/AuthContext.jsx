@@ -12,6 +12,8 @@ const MESSAGES = {
   'auth/invalid-email': 'Please enter a valid email address.',
   'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
   'auth/network-request-failed': 'We could not reach the server. Check your connection and try again.',
+  'auth/popup-closed-by-user': 'Google sign-in was closed before it finished.',
+  'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Please allow pop-ups and try again.',
 };
 
 const friendly = (error) => new Error(MESSAGES[error.code] || 'Something went wrong. Please try again.');
@@ -47,10 +49,29 @@ export function AuthProvider({ children }) {
       user,
       loading,
       isAuthConfigured,
-      async signIn(email, password) {
+      // "Remember me" keeps the session after the browser closes; otherwise it lasts for this tab session.
+      async signIn(email, password, remember = true) {
         const sdk = await requireSdk();
         try {
+          await sdk.setPersistence(sdk.auth, remember ? sdk.browserLocalPersistence : sdk.browserSessionPersistence);
           await sdk.signInWithEmailAndPassword(sdk.auth, email, password);
+        } catch (error) {
+          throw friendly(error);
+        }
+      },
+      async signInWithGoogle(remember = true) {
+        const sdk = await requireSdk();
+        try {
+          await sdk.setPersistence(sdk.auth, remember ? sdk.browserLocalPersistence : sdk.browserSessionPersistence);
+          await sdk.signInWithPopup(sdk.auth, new sdk.GoogleAuthProvider());
+        } catch (error) {
+          throw friendly(error);
+        }
+      },
+      async resetPassword(email) {
+        const sdk = await requireSdk();
+        try {
+          await sdk.sendPasswordResetEmail(sdk.auth, email);
         } catch (error) {
           throw friendly(error);
         }

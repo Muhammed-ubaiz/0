@@ -12,8 +12,8 @@ export default function CategoriesPage() {
         {categoriesBySize.map((category, index) => (
           <Reveal key={category.handle} delay={Math.min(index, 5) * 0.04}>
             <Link to={`/category/${category.handle}`} className="group flex h-full overflow-hidden rounded-[10px] border border-navy/12 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-blue/45 hover:shadow-lift">
-              <div className="w-2/5 shrink-0 bg-mist p-4">
-                <img src={imageUrl(category.image, 360)} alt="" loading="lazy" className="aspect-square size-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
+              <div className="w-2/5 shrink-0 border-r border-navy/10 bg-white p-4">
+                <img src={imageUrl(category.image, 360)} alt="" loading="lazy" className="aspect-square size-full object-contain photo-clean transition-transform duration-500 group-hover:scale-105" />
               </div>
               <div className="flex flex-1 flex-col p-5">
                 <p className="font-mono text-[11px] text-blue">{category.products_count} products</p>

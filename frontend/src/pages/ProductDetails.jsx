@@ -73,7 +73,7 @@ function ProductView({ handle }) {
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <div className="relative aspect-square overflow-hidden rounded-[10px] border border-navy/12 bg-white p-8 sm:p-14">
+            <div className="relative aspect-square overflow-hidden rounded-[10px] border border-navy/12 bg-white p-8 sm:p-12 lg:aspect-auto lg:h-[min(560px,calc(100vh-15rem))] lg:min-h-[380px] lg:p-10">
               <img src={imageUrl(images[activeImage], 1000)} alt={product.title} className="size-full object-contain" />
               {off > 0 && <span className="absolute left-4 top-4 rounded bg-red px-2.5 py-1 text-[12.5px] font-semibold text-white">{off}% off</span>}
             </div>
@@ -154,7 +154,7 @@ function ProductView({ handle }) {
       </div>
 
       {related.length > 0 && (
-        <section className="bg-mist py-14 lg:py-20">
+        <section className="border-t border-navy/10 bg-white py-14 lg:py-20">
           <div className="shell">
             <SectionHeading eyebrow="More in this range" title="You may also need" linkTo={`/category/${product.category}`} linkLabel={`All ${categoryName(product.category)}`} />
             <ProductGrid key={handle} products={related} />

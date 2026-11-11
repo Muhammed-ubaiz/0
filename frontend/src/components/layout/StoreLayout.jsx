@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
 import { whatsappLink } from '../../data/site';
+import WhatsAppIcon from '../ui/WhatsAppIcon';
 import AnnouncementBar from './AnnouncementBar';
 import CartDrawer from './CartDrawer';
 import Footer from './Footer';
@@ -31,9 +31,9 @@ export default function StoreLayout() {
         target="_blank"
         rel="noreferrer"
         aria-label="Chat with us on WhatsApp"
-        className={`fixed bottom-5 right-5 z-30 h-13 items-center gap-2 rounded-full bg-navy px-4 text-[14px] font-semibold text-white shadow-lift transition-colors hover:bg-blue ${hideOnPhones ? 'hidden lg:flex' : 'flex'}`}
+        className={`fixed bottom-5 right-5 z-30 h-14 items-center gap-2.5 rounded-full bg-whatsapp px-4 text-[15px] font-bold text-white shadow-[0_10px_28px_-8px_rgb(37_211_102/0.65)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-whatsapp-dark sm:pr-5 ${hideOnPhones ? 'hidden lg:flex' : 'flex'}`}
       >
-        <MessageCircle size={21} />
+        <WhatsAppIcon size={26} />
         <span className="hidden sm:inline">WhatsApp</span>
       </a>
     </div>

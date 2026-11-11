@@ -11,13 +11,13 @@ const FULL_BLEED = new Set(['cleaning-tools']);
 function CategoryCircle({ category }) {
   const photo = FULL_BLEED.has(category.handle)
     ? 'inset-0 size-full object-cover'
-    : 'inset-[13%] size-[74%] scale-125 object-contain mix-blend-multiply group-hover:scale-[1.38]';
+    : 'inset-[13%] size-[74%] scale-125 object-contain photo-clean group-hover:scale-[1.38]';
 
   return (
     <Link to={`/category/${category.handle}`} className="group flex flex-col items-center text-center">
       <span className="relative block aspect-square w-full max-w-[188px]">
         <span className="absolute -inset-1.5 rounded-full border border-transparent transition-colors duration-300 group-hover:border-blue/35" aria-hidden="true" />
-        <span className="absolute inset-0 overflow-hidden rounded-full bg-mist transition-all duration-300 group-hover:bg-white group-hover:shadow-lift">
+        <span className="absolute inset-0 overflow-hidden rounded-full border border-navy/10 bg-white transition-all duration-300 group-hover:shadow-lift">
           <img src={imageUrl(category.image, 400)} alt="" loading="lazy" className={`absolute transition-transform duration-500 ease-out ${photo}`} />
         </span>
       </span>

@@ -16,9 +16,20 @@ export const formatAED = (value) =>
   `AED ${Number(value || 0).toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 /** Requests a sized version of a Shopify CDN image. */
+// The catalogue stores photo links on idealpackstore.com, which can be slow or unreachable.
+// The same files live on Shopify's own image server, so photos are loaded from there instead.
+const STORE_FILES = /^https?:\/\/(www\.)?idealpackstore\.com\/cdn\/shop\/files\//;
+const SHOPIFY_FILES = 'https://cdn.shopify.com/s/files/1/0978/4895/1101/files/';
+
+/** Requests a sized version of a product photo from Shopify's image server. */
 export function imageUrl(url, width = 600) {
   if (!url) return '';
-  return url.includes('cdn/shop') ? `${url}${url.includes('?') ? '&' : '?'}width=${width}` : url;
+  if (!STORE_FILES.test(url) && !url.includes('cdn.shopify.com')) return url;
+  const [path, query = ''] = url.replace(STORE_FILES, SHOPIFY_FILES).split('?');
+  const params = new URLSearchParams(query);
+  params.delete('format');
+  params.set('width', String(width));
+  return `${path}?${params}`;
 }
 
 /** Percentage off, only when the product has a genuine compare-at price. */

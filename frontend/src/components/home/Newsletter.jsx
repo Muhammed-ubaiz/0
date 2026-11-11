@@ -25,7 +25,7 @@ export default function Newsletter() {
   return (
     <section className="bg-white pb-16 lg:pb-24">
       <div className="shell">
-        <div className="grid items-center gap-8 rounded-[10px] bg-mist p-7 sm:p-10 lg:grid-cols-2 lg:p-14">
+        <div className="grid items-center gap-8 rounded-[10px] border border-navy/10 bg-white p-7 sm:p-10 lg:grid-cols-2 lg:p-14">
           <div>
             <Eyebrow>Newsletter</Eyebrow>
             <h2 className="mt-3 text-3xl font-bold sm:text-4xl">New lines and offers, straight to your inbox</h2>

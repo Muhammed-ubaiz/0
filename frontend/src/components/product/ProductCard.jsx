@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Heart, ShoppingBag } from 'lucide-react';
+import { Check, Heart, Package, ShoppingBag } from 'lucide-react';
 import { useCart, useWishlist } from '../../context/CartContext';
 import { categoryName, discountPercent, formatAED, imageUrl, productSpecs } from '../../lib/catalog';
 
@@ -8,6 +8,7 @@ export default function ProductCard({ product, badge, highlightPrice = false }) 
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [added, setAdded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const off = discountPercent(product);
   const { pricePerPiece } = productSpecs(product);
@@ -22,13 +23,16 @@ export default function ProductCard({ product, badge, highlightPrice = false }) 
 
   return (
     <article className="group flex h-full flex-col rounded-xl border border-navy/10 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:border-blue/30 hover:shadow-lift">
-      <div className="relative aspect-[6/5] overflow-hidden rounded-lg bg-mist/70">
+      <div className="relative aspect-[6/5] overflow-hidden rounded-lg bg-white">
         <Link to={`/product/${product.handle}`} aria-label={product.title} className="absolute inset-0 p-3 sm:p-4">
+          {!loaded && <Package size={30} strokeWidth={1.5} aria-hidden="true" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse text-navy/15" />}
           <img
             src={imageUrl(product.image, 420)}
             alt=""
             loading="lazy"
-            className="size-full scale-105 object-contain mix-blend-multiply transition-transform duration-500 ease-out group-hover:scale-[1.17]"
+            decoding="async"
+            onLoad={() => setLoaded(true)}
+            className={`size-full scale-105 object-contain photo-clean transition-[transform,opacity] duration-500 ease-out group-hover:scale-[1.17] ${loaded ? 'opacity-100' : 'opacity-0'}`}
           />
         </Link>
 

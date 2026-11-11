@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, PackageSearch, SlidersHorizontal, X } from 'lucide-react';
-import { categories, products, searchProducts } from '../../lib/catalog';
+import { categories, formatAED, products, searchProducts } from '../../lib/catalog';
 import ProductGrid from '../product/ProductGrid';
 import Button from '../ui/Button';
 import EmptyState from '../ui/EmptyState';
@@ -22,34 +22,133 @@ const SORTERS = {
   'title-asc': (a, b) => a.title.localeCompare(b.title),
 };
 
-function Filters({ params, update, lockedCategory }) {
-  const activeCategory = lockedCategory ?? params.get('category');
-  const priceInput = 'h-10 w-full rounded-md border border-navy/20 bg-white px-3 font-mono text-[13px] placeholder:text-ink/50';
-  const row = (active) => `flex items-center justify-between rounded-md px-2.5 py-2 text-[14px] transition-colors ${active ? 'bg-navy font-semibold text-white' : 'text-navy hover:bg-mist'}`;
+// Most products are cheap, so the slider uses a squared scale: fine steps at the low end.
+const PRICE_CEILING = Math.ceil(Math.max(...products.map((product) => product.price)) / 10) * 10;
+const STEPS = 1000;
+const toPosition = (price) => Math.round(Math.sqrt(Math.min(price, PRICE_CEILING) / PRICE_CEILING) * STEPS);
+const toPrice = (position) => Math.round(PRICE_CEILING * (position / STEPS) ** 2);
+
+function PriceSlider({ min, max, update }) {
+  const low = min === '' ? 0 : toPosition(Number(min));
+  const high = max === '' ? STEPS : toPosition(Number(max));
+  const lowPrice = min === '' ? 0 : Number(min);
+  const highPrice = max === '' ? PRICE_CEILING : Number(max);
+
+  const setLow = (position) => {
+    const next = Math.min(position, high - 20);
+    update({ min: next <= 0 ? '' : String(toPrice(next)) });
+  };
+  const setHigh = (position) => {
+    const next = Math.max(position, low + 20);
+    update({ max: next >= STEPS ? '' : String(toPrice(next)) });
+  };
 
   return (
-    <div className="space-y-7">
-      <div>
-        <h2 className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-blue">Category</h2>
-        <div className="space-y-0.5">
-          <Link to="/shop" className={row(!activeCategory)}>
-            All products <span className="font-mono text-[12px]">{products.length}</span>
-          </Link>
-          {categories.map((category) => (
-            <Link key={category.handle} to={`/category/${category.handle}`} className={row(activeCategory === category.handle)}>
-              <span className="truncate">{category.name}</span>
-              <span className="font-mono text-[12px]">{category.products_count}</span>
-            </Link>
+    <div>
+      <div className="mb-3 flex items-center justify-between text-[13px] font-semibold text-navy">
+        <span>{formatAED(lowPrice)}</span>
+        <span className="text-ink/40">–</span>
+        <span>{max === '' ? `${formatAED(PRICE_CEILING)}+` : formatAED(highPrice)}</span>
+      </div>
+      <div className="price-range relative h-5">
+        <span className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-mist" aria-hidden="true" />
+        <span className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-blue" style={{ left: `${(low / STEPS) * 100}%`, right: `${100 - (high / STEPS) * 100}%` }} aria-hidden="true" />
+        <input type="range" min="0" max={STEPS} value={low} onChange={(event) => setLow(Number(event.target.value))} aria-label="Minimum price" aria-valuetext={formatAED(lowPrice)} />
+        <input type="range" min="0" max={STEPS} value={high} onChange={(event) => setHigh(Number(event.target.value))} aria-label="Maximum price" aria-valuetext={formatAED(highPrice)} />
+      </div>
+    </div>
+  );
+}
+
+const PRICE_RANGES = [
+  ['Under 10', '', '10'],
+  ['10 – 50', '10', '50'],
+  ['50 – 100', '50', '100'],
+  ['100+', '100', ''],
+];
+
+function FilterSection({ title, children }) {
+  return (
+    <div className="border-t border-navy/10 px-4 py-4 first:border-t-0">
+      <h3 className="mb-2.5 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-ink/55">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function Filters({ params, update, lockedCategory, boxed = false }) {
+  const activeCategory = lockedCategory ?? params.get('category');
+  const min = params.get('min') ?? '';
+  const max = params.get('max') ?? '';
+  const hasPrice = Boolean(min || max);
+
+  const row = (active) =>
+    `relative flex items-center justify-between gap-2 rounded-lg py-[7px] pl-3 pr-2 text-[13.5px] transition-colors ${
+      active ? 'bg-mist font-semibold text-navy before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-blue' : 'text-ink/80 hover:bg-mist/60 hover:text-navy'
+    }`;
+  const count = (active) => `shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums ${active ? 'bg-white text-navy' : 'bg-mist text-ink/60'}`;
+  const priceInput = 'h-10 w-full rounded-lg border border-navy/15 bg-white pl-11 pr-2 text-[13.5px] text-ink placeholder:text-ink/40 hover:border-navy/30 focus:border-blue';
+
+  return (
+    <div className={boxed ? 'overflow-hidden rounded-xl border border-navy/10 bg-white shadow-card' : ''}>
+      {boxed && (
+        <div className="flex items-center justify-between border-b border-navy/10 px-4 py-3">
+          <span className="text-[15px] font-bold text-navy">Filters</span>
+          {(hasPrice || activeCategory) && !lockedCategory && (
+            <Link to="/shop" className="text-[12.5px] font-semibold text-blue hover:text-navy">Clear all</Link>
+          )}
+        </div>
+      )}
+
+      <FilterSection title="Price">
+        <PriceSlider min={min} max={max} update={update} />
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {PRICE_RANGES.map(([label, from, to]) => {
+            const active = min === from && max === to;
+            return (
+              <button
+                key={label}
+                type="button"
+                aria-pressed={active}
+                onClick={() => update(active ? { min: '', max: '' } : { min: from, max: to })}
+                className={`h-8 rounded-full border px-3 text-[12.5px] font-medium transition-colors ${active ? 'border-navy bg-navy text-white' : 'border-navy/15 text-navy hover:border-navy/40 hover:bg-mist'}`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {[['min', 'Min', min], ['max', 'Max', max]].map(([key, label, value]) => (
+            <label key={key} className="relative block">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-ink/45">AED</span>
+              <input type="number" min="0" inputMode="decimal" placeholder={label} aria-label={`${label} price in AED`} className={priceInput} value={value} onChange={(event) => update({ [key]: event.target.value })} />
+            </label>
           ))}
         </div>
-      </div>
-      <div>
-        <h2 className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-blue">Price (AED)</h2>
-        <div className="grid grid-cols-2 gap-2">
-          <input type="number" min="0" inputMode="decimal" placeholder="Min" aria-label="Minimum price" className={priceInput} value={params.get('min') ?? ''} onChange={(event) => update({ min: event.target.value })} />
-          <input type="number" min="0" inputMode="decimal" placeholder="Max" aria-label="Maximum price" className={priceInput} value={params.get('max') ?? ''} onChange={(event) => update({ max: event.target.value })} />
+        {hasPrice && (
+          <button type="button" onClick={() => update({ min: '', max: '' })} className="mt-2.5 text-[12.5px] font-semibold text-blue hover:text-navy">
+            Clear price
+          </button>
+        )}
+      </FilterSection>
+      <FilterSection title="Category">
+        <div className="space-y-0.5">
+          <Link to="/shop" className={row(!activeCategory)}>
+            All products <span className={count(!activeCategory)}>{products.length}</span>
+          </Link>
+          {categories.map((category) => {
+            const active = activeCategory === category.handle;
+            return (
+              <Link key={category.handle} to={`/category/${category.handle}`} className={row(active)} aria-current={active ? 'page' : undefined}>
+                <span className="truncate">{category.name}</span>
+                <span className={count(active)}>{category.products_count}</span>
+              </Link>
+            );
+          })}
         </div>
-      </div>
+      </FilterSection>
+
     </div>
   );
 }
@@ -114,10 +213,10 @@ export default function CatalogView({ lockedCategory }) {
   };
 
   return (
-    <div className="shell grid gap-8 py-8 lg:grid-cols-[250px_1fr] lg:gap-10 lg:py-10">
+    <div className="shell-wide grid gap-8 py-8 lg:grid-cols-[236px_1fr] lg:gap-8 xl:gap-10 lg:py-10">
       <aside className="hidden lg:block">
-        <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
-          <Filters params={params} update={update} lockedCategory={lockedCategory} />
+        <div className="no-scrollbar sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pb-2">
+          <Filters boxed params={params} update={update} lockedCategory={lockedCategory} />
         </div>
       </aside>
 
@@ -141,7 +240,7 @@ export default function CatalogView({ lockedCategory }) {
 
         {visible.length ? (
           <>
-            <ProductGrid key={`${page}-${sort}-${category}-${q}`} products={visible} columns="xl:grid-cols-4 lg:grid-cols-3" />
+            <ProductGrid key={`${page}-${sort}-${category}-${q}`} products={visible} columns="lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
             <Pagination page={page} total={totalPages} onChange={goToPage} />
           </>
         ) : (

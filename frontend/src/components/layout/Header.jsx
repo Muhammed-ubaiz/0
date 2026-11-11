@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ChevronDown, Heart, Menu, ShoppingBag, User, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useCart, useWishlist } from '../../context/CartContext';
 import { categories, categoriesBySize, formatAED, getCategory, imageUrl, products } from '../../lib/catalog';
 import { nav } from '../../data/site';
@@ -42,8 +43,8 @@ function MegaMenu({ onClose }) {
           <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 xl:grid-cols-3">
             {categoriesBySize.map((category) => (
               <Link key={category.handle} to={`/category/${category.handle}`} onClick={onClose} className="group/item flex items-center gap-3.5 rounded-lg p-2 transition-colors duration-200 hover:bg-mist">
-                <span className="size-14 shrink-0 overflow-hidden rounded-md bg-mist transition-colors duration-200 group-hover/item:bg-white">
-                  <img src={imageUrl(category.image, 160)} alt="" className="size-full scale-[1.3] object-contain mix-blend-multiply transition-transform duration-300 group-hover/item:scale-[1.45]" />
+                <span className="size-14 shrink-0 overflow-hidden rounded-md border border-navy/10 bg-white">
+                  <img src={imageUrl(category.image, 160)} alt="" className="size-full scale-[1.3] object-contain photo-clean transition-transform duration-300 group-hover/item:scale-[1.45]" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[14.5px] font-semibold text-navy">{category.name}</span>
@@ -63,7 +64,7 @@ function MegaMenu({ onClose }) {
                 key={handle}
                 src={imageUrl(getCategory(handle).image, 280)}
                 alt=""
-                className={`object-contain mix-blend-multiply transition-transform duration-500 ease-out ${index === 1 ? 'z-10 size-32 group-hover/promo:scale-110' : 'size-24 group-hover/promo:scale-105'} ${index === 0 ? '-mr-5' : ''} ${index === 2 ? '-ml-5' : ''}`}
+                className={`object-contain photo-clean transition-transform duration-500 ease-out ${index === 1 ? 'z-10 size-32 group-hover/promo:scale-110' : 'size-24 group-hover/promo:scale-105'} ${index === 0 ? '-mr-5' : ''} ${index === 2 ? '-ml-5' : ''}`}
               />
             ))}
           </div>
@@ -150,6 +151,7 @@ function MobileMenu({ onClose }) {
 export default function Header() {
   const { totalItems, subtotal, setIsCartOpen } = useCart();
   const { wishlistCount } = useWishlist();
+  const { user } = useAuth();
   const { pathname } = useLocation();
   // Each menu remembers the page it was opened on, so navigating closes it.
   const [mobileOpenOn, setMobileOpenOn] = useState(null);
@@ -166,34 +168,56 @@ export default function Header() {
   };
 
   const navClass = ({ isActive }) =>
-    `relative flex h-12 items-center gap-1 px-4 text-[14px] font-semibold transition-colors hover:bg-white/10 ${isActive ? 'bg-blue' : ''}`;
+    `group relative flex h-12 items-center gap-1 px-4 text-[14px] font-semibold transition-colors ${isActive ? 'text-white' : 'text-white/80 hover:text-white'}`;
+
+  // Red underline marks the current page; a soft one previews on hover.
+  const navBar = (isActive) =>
+    `absolute inset-x-4 bottom-0 h-0.5 rounded-full transition-transform duration-200 ${isActive ? 'scale-x-100 bg-red' : 'scale-x-0 bg-white/40 group-hover:scale-x-100'}`;
+
+  const firstName = user?.displayName?.split(' ')[0];
 
   return (
     <>
       <div className="sticky top-0 z-40 border-b border-navy/10 bg-white">
-        <div className="shell flex h-16 items-center gap-3 lg:h-[76px] lg:gap-8">
+        <div className="shell flex h-16 items-center gap-3 lg:h-[84px] lg:gap-10">
           <button type="button" className={`${iconLink} -ml-2 lg:hidden`} onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <Menu size={23} />
           </button>
 
           <Link to="/" aria-label="Ideal Pack home" className="shrink-0 lg:-ml-8">
-            <img src="/logo-original.png" alt="Ideal Pack, ideas for better packing" className="h-8 w-auto lg:h-11" />
+            <img src="/logo-original.png" alt="Ideal Pack, ideas for better packing" className="h-8 w-auto lg:h-12" />
           </Link>
 
-          <SearchBox className="mx-auto hidden max-w-2xl flex-1 lg:block" />
+          <SearchBox className="hidden max-w-[640px] flex-1 lg:block" />
 
-          <div className="ml-auto flex items-center gap-0.5 lg:ml-0 lg:gap-1">
-            <Link to="/login" className={`${iconLink} max-lg:hidden`} aria-label="Account">
-              <User size={21} />
+          <div className="ml-auto flex items-center gap-0.5 lg:gap-2">
+            <Link to="/login" className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-navy transition-colors hover:bg-mist max-lg:hidden" aria-label="Account">
+              <User size={22} aria-hidden="true" />
+              <span className="hidden text-left leading-tight xl:block">
+                <span className="block text-[11.5px] text-ink/60">{firstName ? `Hello, ${firstName}` : 'Hello, sign in'}</span>
+                <span className="block text-[13.5px] font-semibold">Account</span>
+              </span>
             </Link>
-            <Link to="/wishlist" className={iconLink} aria-label={`Wishlist, ${wishlistCount} items`}>
-              <Heart size={21} />
-              <CountBadge count={wishlistCount} />
+            <Link to="/wishlist" className="relative flex items-center gap-2.5 rounded-lg text-navy transition-colors hover:bg-mist max-lg:size-11 max-lg:justify-center lg:px-2 lg:py-1.5" aria-label={`Wishlist, ${wishlistCount} items`}>
+              <span className="relative">
+                <Heart size={22} aria-hidden="true" />
+                <CountBadge count={wishlistCount} />
+              </span>
+              <span className="hidden text-left leading-tight xl:block">
+                <span className="block text-[11.5px] text-ink/60">Saved</span>
+                <span className="block text-[13.5px] font-semibold">Wishlist</span>
+              </span>
             </Link>
-            <button type="button" onClick={() => setIsCartOpen(true)} className="relative ml-1 flex h-11 items-center gap-2.5 rounded-md text-white max-lg:w-11 max-lg:justify-center lg:bg-navy lg:px-4 lg:transition-colors lg:hover:bg-blue" aria-label={`Cart, ${totalItems} items`}>
-              <ShoppingBag size={21} className="max-lg:text-navy" />
-              <span className="hidden font-mono text-[13px] lg:inline">{formatAED(subtotal)}</span>
-              <CountBadge count={totalItems} />
+            <span className="mx-1 hidden h-9 w-px bg-navy/12 lg:block" aria-hidden="true" />
+            <button type="button" onClick={() => setIsCartOpen(true)} className="relative flex items-center gap-3 rounded-lg text-white max-lg:size-11 max-lg:justify-center lg:h-12 lg:bg-navy lg:pl-3.5 lg:pr-4 lg:transition-colors lg:hover:bg-blue" aria-label={`Cart, ${totalItems} items, ${formatAED(subtotal)}`}>
+              <span className="relative">
+                <ShoppingBag size={22} className="max-lg:text-navy" aria-hidden="true" />
+                <CountBadge count={totalItems} />
+              </span>
+              <span className="hidden text-left leading-tight lg:block">
+                <span className="block text-[11.5px] text-white/70">My cart</span>
+                <span className="block font-display text-[14.5px] font-bold">{formatAED(subtotal)}</span>
+              </span>
             </button>
           </div>
         </div>
@@ -203,28 +227,38 @@ export default function Header() {
       </div>
 
       <div className="on-dark relative z-30 hidden bg-navy text-white lg:block" onMouseLeave={() => delayMega(false)}>
-        <nav className="shell flex items-center justify-between">
-          <div className="flex">
+        <nav className="shell flex items-center justify-between" aria-label="Main">
+          <div className="-ml-4 flex">
             {nav.map((item) =>
               item.mega ? (
                 <div key={item.label} onMouseEnter={() => delayMega(true)}>
                   <NavLink to={item.to} className={navClass} aria-haspopup="true" aria-expanded={megaOpen} onFocus={() => setMegaOpen(true)}>
-                    {item.label}
-                    <ChevronDown size={15} className={`transition-transform ${megaOpen ? 'rotate-180' : ''}`} />
+                    {({ isActive }) => (
+                      <>
+                        {item.label}
+                        <ChevronDown size={15} className={`transition-transform ${megaOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                        <span className={navBar(isActive || megaOpen)} aria-hidden="true" />
+                      </>
+                    )}
                   </NavLink>
                 </div>
               ) : (
                 <div key={item.label} onMouseEnter={() => delayMega(false)}>
                   <NavLink to={item.to} end={item.to === '/'} className={navClass}>
-                    {item.label}
+                    {({ isActive }) => (
+                      <>
+                        {item.label}
+                        <span className={navBar(isActive)} aria-hidden="true" />
+                      </>
+                    )}
                   </NavLink>
                 </div>
               ),
             )}
           </div>
-          <Link to="/contact?type=wholesale" className="group flex items-center gap-1.5 text-[13.5px] font-semibold">
+          <Link to="/contact?type=wholesale" className="group flex h-8 items-center gap-1.5 rounded-md border border-white/25 px-3 text-[13px] font-semibold transition-colors hover:border-white/60 hover:bg-white/10">
             Wholesale enquiry
-            <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </Link>
         </nav>
         <AnimatePresence>{megaOpen && <MegaMenu onClose={() => setMegaOpen(false)} />}</AnimatePresence>
