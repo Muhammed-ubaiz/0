@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Check, Heart, Package, ShoppingBag } from 'lucide-react';
+import { Check, Eye, Heart, Package, ShoppingBag } from 'lucide-react';
 import { useCart, useWishlist } from '../../context/CartContext';
+import QuickView from './QuickView';
 import { categoryName, discountPercent, formatAED, imageUrl, productSpecs } from '../../lib/catalog';
 
 export default function ProductCard({ product, badge, highlightPrice = false }) {
@@ -9,6 +11,8 @@ export default function ProductCard({ product, badge, highlightPrice = false }) 
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [added, setAdded] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [quickView, setQuickView] = useState(false);
+  const closeQuickView = useCallback(() => setQuickView(false), []);
 
   const off = discountPercent(product);
   const { pricePerPiece } = productSpecs(product);
@@ -51,6 +55,16 @@ export default function ProductCard({ product, badge, highlightPrice = false }) 
         >
           <Heart size={15} className={saved ? 'fill-red text-red' : ''} />
         </button>
+
+        <button
+          type="button"
+          onClick={() => setQuickView(true)}
+          aria-label={`Quick view: ${product.title}`}
+          className="absolute right-1.5 top-11 grid size-8 place-items-center rounded-full bg-white text-navy shadow-card transition-colors hover:text-blue lg:inset-x-2 lg:bottom-2 lg:top-auto lg:flex lg:h-9 lg:w-auto lg:translate-y-2 lg:items-center lg:justify-center lg:gap-1.5 lg:rounded-lg lg:bg-white/95 lg:text-[12.5px] lg:font-semibold lg:opacity-0 lg:backdrop-blur lg:transition-all lg:duration-300 lg:hover:bg-navy lg:hover:text-white lg:group-hover:translate-y-0 lg:group-hover:opacity-100 lg:focus-visible:translate-y-0 lg:focus-visible:opacity-100"
+        >
+          <Eye size={15} />
+          <span className="hidden lg:inline">Quick view</span>
+        </button>
       </div>
 
       <div className="flex flex-1 flex-col px-1.5 pb-1 pt-3">
@@ -78,6 +92,8 @@ export default function ProductCard({ product, badge, highlightPrice = false }) 
           </button>
         </div>
       </div>
+
+      <AnimatePresence>{quickView && <QuickView product={product} onClose={closeQuickView} />}</AnimatePresence>
     </article>
   );
 }

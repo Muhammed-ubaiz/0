@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, PackageSearch, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PackageSearch, Search, SlidersHorizontal, X } from 'lucide-react';
 import { categories, formatAED, products, searchProducts } from '../../lib/catalog';
 import ProductGrid from '../product/ProductGrid';
 import Button from '../ui/Button';
@@ -134,22 +134,68 @@ function Filters({ params, update, lockedCategory, boxed = false }) {
       </FilterSection>
       <FilterSection title="Category">
         <div className="space-y-0.5">
-          <Link to="/shop" className={row(!activeCategory)}>
-            All products <span className={count(!activeCategory)}>{products.length}</span>
-          </Link>
+          {lockedCategory ? (
+            <Link to="/shop" className={row(false)}>
+              All products <span className={count(false)}>{products.length}</span>
+            </Link>
+          ) : (
+            <button type="button" onClick={() => update({ category: '' })} aria-pressed={!activeCategory} className={`${row(!activeCategory)} w-full`}>
+              All products <span className={count(!activeCategory)}>{products.length}</span>
+            </button>
+          )}
           {categories.map((category) => {
             const active = activeCategory === category.handle;
-            return (
+            // On the category page these lead to other categories; on the shop page they filter in place.
+            return lockedCategory ? (
               <Link key={category.handle} to={`/category/${category.handle}`} className={row(active)} aria-current={active ? 'page' : undefined}>
                 <span className="truncate">{category.name}</span>
                 <span className={count(active)}>{category.products_count}</span>
               </Link>
+            ) : (
+              <button key={category.handle} type="button" onClick={() => update({ category: active ? '' : category.handle })} aria-pressed={active} className={`${row(active)} w-full text-left`}>
+                <span className="truncate">{category.name}</span>
+                <span className={count(active)}>{category.products_count}</span>
+              </button>
             );
           })}
         </div>
       </FilterSection>
 
     </div>
+  );
+}
+
+function CatalogSearch({ initial, onSearch, placeholder }) {
+  const [value, setValue] = useState(initial);
+  const submit = (text) => {
+    setValue(text);
+    onSearch(text.trim());
+  };
+
+  return (
+    <form
+      role="search"
+      onSubmit={(event) => {
+        event.preventDefault();
+        submit(value);
+      }}
+      className="flex h-10 min-w-0 flex-1 items-center rounded-lg border border-navy/15 bg-white pl-3 transition-colors focus-within:border-blue/60 sm:max-w-sm"
+    >
+      <Search size={16} className="shrink-0 text-ink/50" aria-hidden="true" />
+      <input
+        type="search"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder={placeholder}
+        aria-label="Search products"
+        className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[14px] text-ink outline-none placeholder:text-ink/45 [&::-webkit-search-cancel-button]:hidden"
+      />
+      {value && (
+        <button type="button" onClick={() => submit('')} aria-label="Clear search" className="mr-1 grid size-8 shrink-0 place-items-center rounded-md text-ink/55 hover:bg-mist hover:text-navy">
+          <X size={15} />
+        </button>
+      )}
+    </form>
   );
 }
 
@@ -181,6 +227,7 @@ function Pagination({ page, total, onChange }) {
 export default function CatalogView({ lockedCategory }) {
   const [params, setParams] = useSearchParams();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const topRef = useRef(null);
 
   const update = (changes, keepPage = false) => {
     const next = new URLSearchParams(params);
@@ -209,11 +256,11 @@ export default function CatalogView({ lockedCategory }) {
 
   const goToPage = (next) => {
     update({ page: next > 1 ? String(next) : '' }, true);
-    window.scrollTo({ top: 0 });
+    topRef.current?.scrollIntoView({ block: 'start' });
   };
 
   return (
-    <div className="shell-wide grid gap-8 py-8 lg:grid-cols-[236px_1fr] lg:gap-8 xl:gap-10 lg:py-10">
+    <div ref={topRef} className="shell-wide grid scroll-mt-24 gap-8 py-8 lg:grid-cols-[236px_1fr] lg:gap-8 xl:gap-10 lg:py-10">
       <aside className="hidden lg:block">
         <div className="no-scrollbar sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pb-2">
           <Filters boxed params={params} update={update} lockedCategory={lockedCategory} />
@@ -221,12 +268,13 @@ export default function CatalogView({ lockedCategory }) {
       </aside>
 
       <div className="min-w-0">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[14px] text-ink/75" aria-live="polite">
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <CatalogSearch key={q} initial={q} onSearch={(value) => update({ q: value })} placeholder={lockedCategory ? 'Search this category' : 'Search by name, size or material'} />
+          <p className="order-last w-full text-[14px] text-ink/75 sm:order-none sm:w-auto" aria-live="polite">
             <strong className="font-mono font-medium text-navy">{results.length}</strong> {results.length === 1 ? 'product' : 'products'}
             {q && <> for “{q}”</>}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <Button variant="outline" size="sm" className="lg:hidden" onClick={() => setSheetOpen(true)}>
               <SlidersHorizontal size={15} /> Filters
             </Button>

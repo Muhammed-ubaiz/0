@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { whatsappLink } from '../../data/site';
 import WhatsAppIcon from '../ui/WhatsAppIcon';
@@ -9,8 +9,13 @@ import Header from './Header';
 
 export default function StoreLayout() {
   const { pathname, search } = useLocation();
+  const lastPath = useRef(null);
 
   useEffect(() => {
+    const samePage = lastPath.current === pathname;
+    lastPath.current = pathname;
+    // The shop page scrolls itself: filters keep your place, and a search jumps to the results.
+    if (pathname === '/shop' && (samePage || search)) return;
     window.scrollTo(0, 0);
   }, [pathname, search]);
 
